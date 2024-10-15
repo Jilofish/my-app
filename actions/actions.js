@@ -70,3 +70,53 @@ export const updateBlog = async (id, formData) => {
    revalidatePath(`/blogs/update-blog/${id}`)
    redirect('/blogs')
 }
+
+
+//add comment to a blog
+export const addCommentToBLog = async (blogId, formData) => {
+
+    //collect info from the form using formData
+    const text = formData.get('text');
+
+    //push the data into the DB
+    const added_comment = await prisma.comment.create({
+        data: {
+            blogId: blogId, 
+            text: text
+        }
+    })
+
+    revalidatePath(`/blogs/${blogId}`)
+    redirect(`/blogs/${blogId}`)
+ }
+
+ // fetching all comments
+export const fetchComments = async (blogId) => {
+
+    //const skip = (page - 1) * pageSize
+
+    const comments = await prisma.comment.findMany({
+        where: {
+            blogId: blogId
+        },
+        orderBy: {
+            createdAt: 'desc'
+        },
+        take: 5
+    })
+
+    return comments
+
+}
+
+//delete Comment by Id and blogId
+
+export const deleteComment = async (commentId, blogId) => {
+    await prisma.comment.delete({
+        where: {
+            id: commentId
+        }
+    })
+
+    revalidatePath(`/blogs/${blogId}`)
+}
