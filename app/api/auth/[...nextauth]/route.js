@@ -55,10 +55,44 @@ export const authOptions = {
                     permissions: user?.permissions
                 }
 
-
             }
         })
     ],
+
+    callbacks: {
+        async session({ session, token }) {
+            console.log('session token', token)
+            return {
+                ...session,
+                user: {
+                    ...session.user,
+                    id: token.id,
+                    email: token.email,
+                    username: token.username,
+                    role: token.role,
+                    permissions: token?.permissions
+                }
+            }
+        },
+        
+        async jwt({ token, user}) {
+
+            // after login jwt token and get the user data from here
+            if(user) {
+                return {
+                    ...token,
+                    id: user.id,
+                    email: user.email,
+                    username: user.username,
+                    role: user.role,
+                    permissions: user?.permissions
+                }
+            }
+            console.log('token info', token)
+            return token
+        }
+    },
+    
     pages: {
         signIn: '/login'
     },
